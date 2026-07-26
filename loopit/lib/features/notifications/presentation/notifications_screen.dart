@@ -43,7 +43,7 @@ class _NotificationsScreenState
                     onTap: () {
                       if (!_allMarkedAsRead) {
                         setState(() {
-                          _allMarkedAsRead = true; // Permanently marks as read
+                          _allMarkedAsRead = true;
                         });
                       }
                     },
