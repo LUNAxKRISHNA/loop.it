@@ -50,126 +50,147 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Positioned.fill(
               child: Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 24.0,
+                  ),
                   child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: Image.asset(
-                        'assets/images/loopit.png',
-                        height: 90,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.apps, size: 90),
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Image.asset(
+                          'assets/images/loopit.png',
+                          height: 90,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.apps, size: 90),
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 40),
+                      const SizedBox(height: 40),
 
-                    const Text(
-                      'Sign in to continue manage campus\ndispatches and deliveries.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: LoopitColors.grey500,
-                        fontWeight: FontWeight.w400,
-                        height: 1.4,
+                      const Text(
+                        'Sign in to continue manage campus\ndispatches and deliveries.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: LoopitColors.grey500,
+                          fontWeight: FontWeight.w400,
+                          height: 1.4,
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // --- Input Fields ---
-                    const PremiumTextField(
-                      title: 'Email',
-                      prefixIcon: Icons.email_outlined,
-                    ),
-                    const SizedBox(height: 16),
-                    const PremiumTextField(
-                      title: 'Password',
-                      prefixIcon: Icons.lock_outline,
-                      isPassword: true,
-                    ),
-                    const SizedBox(height: 16),
+                      // --- Input Fields ---
+                      const PremiumTextField(
+                        title: 'Email',
+                        prefixIcon: Icons.email_outlined,
+                      ),
+                      const SizedBox(height: 16),
+                      const PremiumTextField(
+                        title: 'Password',
+                        prefixIcon: Icons.lock_outline,
+                        isPassword: true,
+                      ),
+                      const SizedBox(height: 16),
 
-                    // --- Remember Me ---
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _rememberMe = !_rememberMe;
-                            });
-                          },
-                          child: Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: _rememberMe
-                                  ? LoopitColors.black
-                                  : Colors.transparent,
-                              shape: BoxShape.circle,
-                              border: Border.all(
+                      // --- Remember Me ---
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _rememberMe = !_rememberMe;
+                              });
+                            },
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
                                 color: _rememberMe
                                     ? LoopitColors.black
-                                    : LoopitColors.grey300,
-                                width: 1.5,
+                                    : Colors.transparent,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: _rememberMe
+                                      ? LoopitColors.black
+                                      : LoopitColors.grey300,
+                                  width: 1.5,
+                                ),
                               ),
+                              child: _rememberMe
+                                  ? const Icon(
+                                      Icons.check,
+                                      color: LoopitColors.white,
+                                      size: 14,
+                                    )
+                                  : null,
                             ),
-                            child: _rememberMe
-                                ? const Icon(
-                                    Icons.check,
-                                    color: LoopitColors.white,
-                                    size: 14,
-                                  )
-                                : null,
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Remember me',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: LoopitColors.grey500,
-                            fontWeight: FontWeight.w500,
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Remember me',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: LoopitColors.grey500,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // --- Buttons ---
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final authState = ref.watch(authNotifierProvider);
+                          final isLoading = authState.isLoading;
+
+                          return PremiumButton(
+                            text: isLoading ? 'Signing In...' : 'Sign In',
+                            onPressed: isLoading
+                                ? () {}
+                                : () {
+                                    ref
+                                        .read(authNotifierProvider.notifier)
+                                        .signIn('test@example.com', 'password')
+                                        .then((_) {
+                                      if (context.mounted &&
+                                          !ref
+                                              .read(authNotifierProvider)
+                                              .hasError) {
+                                        Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const MainScaffold(),
+                                          ),
+                                        );
+                                      }
+                                    });
+                                  },
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // --- Footer Text ---
+                      const Text(
+                        'Managed by Transportation Department\nMade by School of STEM',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: LoopitColors.grey500,
+                          fontWeight: FontWeight.w400,
+                          height: 1.4,
                         ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // --- Buttons ---
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final authState = ref.watch(authNotifierProvider);
-                        final isLoading = authState.isLoading;
-
-                        return PremiumButton(
-                          text: isLoading ? 'Signing In...' : 'Sign In',
-                          onPressed: isLoading
-                              ? () {}
-                              : () {
-                                  ref
-                                      .read(authNotifierProvider.notifier)
-                                      .signIn('test@example.com', 'password')
-                                      .then((_) {
-                                    if (context.mounted && !ref.read(authNotifierProvider).hasError) {
-                                      Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                          builder: (context) => const MainScaffold(),
-                                        ),
-                                      );
-                                    }
-                                  });
-                                },
-                        );
-                      },
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
             ),
           ],
         ),
