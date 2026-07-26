@@ -41,9 +41,11 @@ class _NotificationsScreenState
                   ),
                   GestureDetector(
                     onTap: () {
-                      setState(() {
-                        _allMarkedAsRead = !_allMarkedAsRead;
-                      });
+                      if (!_allMarkedAsRead) {
+                        setState(() {
+                          _allMarkedAsRead = true; // Permanently marks as read
+                        });
+                      }
                     },
                     child: Container(
                       padding: const EdgeInsets.all(12),
@@ -159,7 +161,7 @@ class NotificationCard extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              isUnread ? unreadIcon : readIcon, // Changes icon to tick when read
+              isUnread ? unreadIcon : readIcon,
               size: 20,
               color: isUnread
                   ? LoopitColors.white
