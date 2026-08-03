@@ -19,7 +19,8 @@ class _MainScaffoldState extends State<MainScaffold> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const Center(
-        child: Text('Dispatches Screen', style: TextStyle(fontFamily: 'Inter'))),
+      child: Text('Dispatches Screen', style: TextStyle(fontFamily: 'Inter')),
+    ),
     const NotificationsScreen(),
     const ProfileScreen(),
   ];
@@ -138,7 +139,7 @@ class _MainScaffoldState extends State<MainScaffold> {
                 ),
                 onTap: () {
                   Navigator.pop(context); // Close the bottom sheet first
-                  
+
                   // Navigate to the camera scanner interface
                   Navigator.push(
                     context,
@@ -262,13 +263,14 @@ class _MainScaffoldState extends State<MainScaffold> {
                         isSelected: _currentIndex == 1,
                         onTap: () => _onNavTabTapped(1),
                       ),
-                      
+
                       // --- Inverted QR Code Item ---
                       _NavBarItem(
                         icon: Icons.qr_code_scanner_rounded,
                         label: 'QR Code',
                         isSelected: false,
-                        invertColors: true, // Turns it into a primary action button
+                        invertColors:
+                            true, // Turns it into a primary action button
                         onTap: () => _showQrCodePopup(context),
                       ),
 
@@ -301,14 +303,14 @@ class _NavBarItem extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
-  final bool invertColors; 
+  final bool invertColors;
 
   const _NavBarItem({
     required this.icon,
     required this.label,
     required this.isSelected,
     required this.onTap,
-    this.invertColors = false, 
+    this.invertColors = false,
   });
 
   @override
@@ -319,40 +321,40 @@ class _NavBarItem extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Inverted Color Logic applied here
-          if (invertColors)
+          if (invertColors) ...[
             Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: LoopitColors.black, 
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: LoopitColors.black,
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: LoopitColors.black.withValues(alpha: 0.25),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              child: Icon(
-                icon,
-                color: LoopitColors.white, 
-                size: 22,
-              ),
-            )
-          else
+              child: Icon(icon, color: LoopitColors.white, size: 24),
+            ),
+          ] else ...[
             Icon(
               icon,
               color: isSelected ? LoopitColors.black : LoopitColors.grey500,
               size: 24,
             ),
-            
-          const SizedBox(height: 4),
-          
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 10,
-              fontWeight: (isSelected || invertColors) ? FontWeight.w600 : FontWeight.w500,
-              color: invertColors 
-                  ? LoopitColors.black 
-                  : (isSelected ? LoopitColors.black : LoopitColors.grey500),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? LoopitColors.black : LoopitColors.grey500,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -374,7 +376,9 @@ class QrScannerScreen extends StatelessWidget {
           // 1. Placeholder for the actual Camera View (e.g., mobile_scanner)
           Positioned.fill(
             child: Container(
-              color: const Color(0xFF1E293B), // Dark slate placeholder background
+              color: const Color(
+                0xFF1E293B,
+              ), // Dark slate placeholder background
               child: const Center(
                 child: Icon(
                   Icons.videocam_outlined,
@@ -394,9 +398,7 @@ class QrScannerScreen extends StatelessWidget {
             child: Stack(
               children: [
                 Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.transparent,
-                  ),
+                  decoration: const BoxDecoration(color: Colors.transparent),
                   child: Align(
                     alignment: Alignment.center,
                     child: Container(
@@ -420,10 +422,7 @@ class QrScannerScreen extends StatelessWidget {
               height: 280,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: Colors.blueAccent,
-                  width: 2.5,
-                ),
+                border: Border.all(color: Colors.blueAccent, width: 2.5),
               ),
             ),
           ),
@@ -431,7 +430,10 @@ class QrScannerScreen extends StatelessWidget {
           // 4. Header with Back Button
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -441,7 +443,10 @@ class QrScannerScreen extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                      icon: const Icon(
+                        Icons.arrow_back_rounded,
+                        color: Colors.white,
+                      ),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),

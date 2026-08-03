@@ -512,6 +512,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
               Expanded(
                 child: ListView(
+                  padding: const EdgeInsets.only(bottom: 120),
                   children: [
                     // Notification 1
                     NotificationCard(

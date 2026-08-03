@@ -194,7 +194,7 @@ class HomeScreen extends ConsumerWidget {
                   const Expanded(child: _ActionCard(icon: Icons.person_outline, label: 'Assigned\n')),
                 ],
               ),
-              const SizedBox(height: 32), // Bottom padding for navigation bar overlap
+              const SizedBox(height: 120), // Bottom padding for floating navigation bar clearance
             ],
           ),
         ),

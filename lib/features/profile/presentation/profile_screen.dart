@@ -20,7 +20,7 @@ class ProfileScreen extends ConsumerWidget {
       backgroundColor: LoopitColors.grey50, // Matches app background
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 100), // Bottom padding for nav bar
+          padding: const EdgeInsets.only(bottom: 120), // Bottom padding for nav bar clearance
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
