@@ -239,12 +239,18 @@ class NotificationCard extends StatelessWidget {
 */
 
 
+
+
+
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loopit_ui/loopit_ui.dart';
 
-import '../../../core/models/dispatch_model.dart';
-import '../../dispatch/data/dispatch_repository.dart';
+// FIXED: Upgraded to Absolute Imports to prevent broken folder paths!
+import 'package:loopit/core/models/dispatch_model.dart';
+import 'package:loopit/features/dispatch/data/dispatch_repository.dart';
 
 final _notificationsDispatchesProvider = FutureProvider<List<DispatchModel>>((ref) {
   return ref.watch(dispatchRepositoryProvider).getMyDispatches();
@@ -498,7 +504,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         borderRadius: BorderRadius.circular(18),
                         boxShadow: [
                           BoxShadow(
-                            color: LoopitColors.black.withValues(alpha: 0.05),
+                            color: LoopitColors.black.withOpacity(0.05), // FIXED: withOpacity
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -626,7 +632,7 @@ class NotificationCard extends StatelessWidget {
               : null,
           boxShadow: [
             BoxShadow(
-              color: LoopitColors.black.withValues(alpha: 0.03),
+              color: LoopitColors.black.withOpacity(0.03), // FIXED: withOpacity
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
