@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "403307999788",
-    "project_id": "loopit-cvv2026-7b5d3",
-    "storage_bucket": "loopit-cvv2026-7b5d3.firebasestorage.app"
+    "project_number": "626160726695",
+    "project_id": "loopit-505716",
+    "storage_bucket": "loopit-505716.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:403307999788:android:8791c552e716fd387dd789",
+        "mobilesdk_app_id": "1:626160726695:android:d1f3ab350b1c44f1d06182",
         "android_client_info": {
           "package_name": "com.loopit.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "626160726695-dveeunq5o7gqfs6cruoj5kaailfr376u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.loopit.app",
+            "certificate_hash": "111f634d5bb3565acbc2cb3bbb3be6b686931e18"
+          }
+        },
+        {
+          "client_id": "626160726695-bcvfeh04i5tl9qsrtmr3scfr2qhscaim.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyD3c48p8SvX0UHvL9893-O8_teKz1uuQuQ"
+          "current_key": "AIzaSyAgPHrO6ZLkHfOYRA1M_H5RrT9NqEtQIAM"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "626160726695-bcvfeh04i5tl9qsrtmr3scfr2qhscaim.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
