@@ -820,16 +820,56 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         return Material(
                                           color: Colors.transparent,
                                           child: InkWell(
-                                             onTap: isLoading
+                                            onTap: isLoading
                                                 ? null
-                                                : () {
-                                                    Navigator.of(context)
-                                                        .pushReplacement(
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const MainScaffold(),
-                                                      ),
-                                                    );
+                                                : () async {
+                                                    try {
+                                                      await ref
+                                                          .read(authNotifierProvider
+                                                              .notifier)
+                                                          .signInWithGoogle();
+                                                      if (context.mounted &&
+                                                          !ref
+                                                              .read(
+                                                                  authNotifierProvider)
+                                                              .hasError) {
+                                                        Navigator.of(context)
+                                                            .pushReplacement(
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                const MainScaffold(),
+                                                          ),
+                                                        );
+                                                      }
+                                                    } catch (e) {
+                                                      if (context.mounted) {
+                                                        final message = e
+                                                            .toString()
+                                                            .replaceAll(
+                                                                'Exception: ',
+                                                                '');
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          SnackBar(
+                                                            content: Text(
+                                                              message,
+                                                              style:
+                                                                  const TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                            backgroundColor:
+                                                                const Color(
+                                                                    0xFFDC2626),
+                                                            behavior:
+                                                                SnackBarBehavior
+                                                                    .floating,
+                                                          ),
+                                                        );
+                                                      }
+                                                    }
                                                   },
                                             borderRadius:
                                                 BorderRadius.circular(28),
