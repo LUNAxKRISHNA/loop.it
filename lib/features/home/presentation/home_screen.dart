@@ -4,7 +4,13 @@ import 'package:loopit_ui/loopit_ui.dart';
 
 import '../../auth/application/auth_notifier.dart';
 
+import '../../../core/models/dispatch_model.dart';
+import '../../dispatch/data/dispatch_repository.dart';
 import '../../dispatch/presentation/create_dispatch/create_dispatch_screen.dart';
+
+final myDispatchesProvider = FutureProvider<List<DispatchModel>>((ref) {
+  return ref.watch(dispatchRepositoryProvider).getMyDispatches();
+});
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -23,9 +29,10 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userState = ref.watch(authNotifierProvider);
-    final userName = userState.valueOrNull?.name ?? 'Loading...';
-
-    const mockStats = (active: 3, pending: 2, assigned: 5, completed: 10);
+    final user = userState.valueOrNull;
+    final userName = user?.name ?? 'User';
+    final currentUserId = user?.id;
+    final dispatchesAsync = ref.watch(myDispatchesProvider);
 
     return Scaffold(
       backgroundColor: LoopitColors.grey50, // Light background for contrast with white cards
@@ -129,35 +136,76 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 32),
 
               // Statistics Grid
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 1.25,
-                children: [
-                  _StatCard(
-                    icon: Icons.inventory_2_outlined,
-                    value: mockStats.active.toString().padLeft(2, '0'),
-                    label: 'Active Dispatches',
+              dispatchesAsync.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32.0),
+                    child: CircularProgressIndicator(),
                   ),
-                  _StatCard(
-                    icon: Icons.download_outlined,
-                    value: mockStats.pending.toString().padLeft(2, '0'),
-                    label: 'Pending Collection',
+                ),
+                error: (error, stack) => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text(
+                      'Unable to load stats from Supabase',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 13,
+                        color: LoopitColors.grey500,
+                      ),
+                    ),
                   ),
-                  _StatCard(
-                    icon: Icons.local_shipping_outlined,
-                    value: mockStats.assigned.toString().padLeft(2, '0'),
-                    label: 'Assigned Deliveries',
-                  ),
-                  _StatCard(
-                    icon: Icons.check_circle_outline,
-                    value: mockStats.completed.toString().padLeft(2, '0'),
-                    label: 'Completed',
-                  ),
-                ],
+                ),
+                data: (dispatches) {
+                  final activeCount = dispatches.where((d) =>
+                    d.status == DispatchStatus.inTransit ||
+                    d.status == DispatchStatus.collectedSource ||
+                    d.status == DispatchStatus.arrivedDestination
+                  ).length;
+
+                  final pendingCount = dispatches.where((d) =>
+                    d.status == DispatchStatus.pending
+                  ).length;
+
+                  final assignedCount = dispatches.where((d) =>
+                    currentUserId != null && d.currentHolderId == currentUserId
+                  ).length;
+
+                  final completedCount = dispatches.where((d) =>
+                    d.status == DispatchStatus.completed
+                  ).length;
+
+                  return GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 1.25,
+                    children: [
+                      _StatCard(
+                        icon: Icons.inventory_2_outlined,
+                        value: activeCount.toString().padLeft(2, '0'),
+                        label: 'Active Dispatches',
+                      ),
+                      _StatCard(
+                        icon: Icons.download_outlined,
+                        value: pendingCount.toString().padLeft(2, '0'),
+                        label: 'Pending Collection',
+                      ),
+                      _StatCard(
+                        icon: Icons.local_shipping_outlined,
+                        value: assignedCount.toString().padLeft(2, '0'),
+                        label: 'Assigned Deliveries',
+                      ),
+                      _StatCard(
+                        icon: Icons.check_circle_outline,
+                        value: completedCount.toString().padLeft(2, '0'),
+                        label: 'Completed',
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 32),
 

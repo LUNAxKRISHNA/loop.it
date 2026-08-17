@@ -820,31 +820,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         return Material(
                                           color: Colors.transparent,
                                           child: InkWell(
-                                            onTap: isLoading
+                                             onTap: isLoading
                                                 ? null
                                                 : () {
-                                                    ref
-                                                        .read(
-                                                            authNotifierProvider
-                                                                .notifier)
-                                                        .signIn(
-                                                            'test@example.com',
-                                                            'password')
-                                                        .then((_) {
-                                                      if (context.mounted &&
-                                                          !ref
-                                                              .read(
-                                                                  authNotifierProvider)
-                                                              .hasError) {
-                                                        Navigator.of(context)
-                                                            .pushReplacement(
-                                                          MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                const MainScaffold(),
-                                                          ),
-                                                        );
-                                                      }
-                                                    });
+                                                    Navigator.of(context)
+                                                        .pushReplacement(
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const MainScaffold(),
+                                                      ),
+                                                    );
                                                   },
                                             borderRadius:
                                                 BorderRadius.circular(28),

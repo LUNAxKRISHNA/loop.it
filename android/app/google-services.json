@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "403307999788",
+    "project_id": "loopit-cvv2026-7b5d3",
+    "storage_bucket": "loopit-cvv2026-7b5d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:403307999788:android:8791c552e716fd387dd789",
+        "android_client_info": {
+          "package_name": "com.loopit.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3c48p8SvX0UHvL9893-O8_teKz1uuQuQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

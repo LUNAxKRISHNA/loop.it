@@ -243,6 +243,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loopit_ui/loopit_ui.dart';
 
+import '../../../core/models/dispatch_model.dart';
+import '../../dispatch/data/dispatch_repository.dart';
+
+final _notificationsDispatchesProvider = FutureProvider<List<DispatchModel>>((ref) {
+  return ref.watch(dispatchRepositoryProvider).getMyDispatches();
+});
+
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
@@ -252,7 +259,7 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
-  bool _firstNotificationRead = false;
+  final Set<String> _readNotificationIds = {};
 
   void _showNotificationDetails({
     required BuildContext context,
@@ -314,7 +321,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: status == "Pending"
+                      color: status.contains("Pending")
                           ? const Color(0xFFFEF3C7)
                           : const Color(0xFFD1FAE5),
                       borderRadius: BorderRadius.circular(12),
@@ -325,7 +332,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         fontFamily: "Inter",
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: status == "Pending"
+                        color: status.contains("Pending")
                             ? const Color(0xFFD97706)
                             : const Color(0xFF059669),
                       ),
@@ -383,9 +390,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   children: [
                     _buildDetailRow("Dispatch ID", dispatchId),
                     const SizedBox(height: 10),
-                    _buildDetailRow("Destination", location),
+                    _buildDetailRow("Status", status),
                     const SizedBox(height: 10),
-                    _buildDetailRow("Sent By", sentBy),
+                    _buildDetailRow("Current Holder", sentBy),
                   ],
                 ),
               ),
@@ -452,6 +459,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final dispatchesAsync = ref.watch(_notificationsDispatchesProvider);
+
     return Scaffold(
       backgroundColor: LoopitColors.grey50,
       body: SafeArea(
@@ -477,11 +486,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      if (!_firstNotificationRead) {
-                        setState(() {
-                          _firstNotificationRead = true;
-                        });
-                      }
+                      final dispatches = dispatchesAsync.valueOrNull ?? [];
+                      setState(() {
+                        _readNotificationIds.addAll(dispatches.map((d) => d.id));
+                      });
                     },
                     child: Container(
                       padding: const EdgeInsets.all(12),
@@ -496,12 +504,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           ),
                         ],
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.done_all,
                         size: 20,
-                        color: _firstNotificationRead
-                            ? Colors.blue
-                            : LoopitColors.black,
+                        color: LoopitColors.black,
                       ),
                     ),
                   ),
@@ -511,64 +517,68 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               const SizedBox(height: 24),
 
               Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.only(bottom: 120),
-                  children: [
-                    // Notification 1
-                    NotificationCard(
-                      isUnread: !_firstNotificationRead,
-                      unreadIcon: Icons.local_shipping_outlined,
-                      readIcon: Icons.check_circle_outline,
-                      title: "New Dispatch Assigned",
-                      description:
-                          "You have been assigned a new dispatch #DSP-1235 for South Campus.",
-                      time: "2 mins ago",
-                      onTap: () {
-                        if (!_firstNotificationRead) {
-                          setState(() {
-                            _firstNotificationRead = true;
-                          });
-                        }
-                        _showNotificationDetails(
-                          context: context,
-                          title: "New Dispatch Assigned",
-                          description:
-                              "You have been assigned a new dispatch #DSP-1235 for South Campus. Please confirm receipt and verify the route assignment.",
-                          time: "2 mins ago",
-                          dispatchId: "#DSP-1235",
-                          status: "Pending",
-                          location: "South Campus - Block B",
-                          sentBy: "Transportation Dept.",
+                child: dispatchesAsync.when(
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(
+                    child: Text(
+                      "Unable to load notifications: $e",
+                      style: const TextStyle(
+                        fontFamily: "Inter",
+                        color: LoopitColors.grey500,
+                      ),
+                    ),
+                  ),
+                  data: (dispatches) {
+                    if (dispatches.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "No notifications available.",
+                          style: TextStyle(
+                            fontFamily: "Inter",
+                            fontSize: 14,
+                            color: LoopitColors.grey500,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 120),
+                      itemCount: dispatches.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 16),
+                      itemBuilder: (context, index) {
+                        final dispatch = dispatches[index];
+                        final isUnread = !_readNotificationIds.contains(dispatch.id);
+                        final title = dispatch.title ?? dispatch.dispatchNo ?? "Dispatch Update";
+                        final desc = dispatch.description ?? "Status updated to ${dispatch.status.displayLabel}";
+                        final timeStr = "${dispatch.createdAt.day}/${dispatch.createdAt.month}/${dispatch.createdAt.year}";
+
+                        return NotificationCard(
+                          isUnread: isUnread,
+                          unreadIcon: Icons.local_shipping_outlined,
+                          readIcon: Icons.check_circle_outline,
+                          title: title,
+                          description: desc,
+                          time: timeStr,
+                          onTap: () {
+                            setState(() {
+                              _readNotificationIds.add(dispatch.id);
+                            });
+                            _showNotificationDetails(
+                              context: context,
+                              title: title,
+                              description: desc,
+                              time: timeStr,
+                              dispatchId: dispatch.dispatchNo ?? dispatch.id,
+                              status: dispatch.status.displayLabel,
+                              location: dispatch.currentCampusId ?? "Campus",
+                              sentBy: dispatch.currentHolderName ?? "Transportation Dept.",
+                            );
+                          },
                         );
                       },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Notification 2
-                    NotificationCard(
-                      isUnread: false,
-                      unreadIcon: Icons.local_shipping_outlined,
-                      readIcon: Icons.check_circle_outline,
-                      title: "Dispatch #DSP-1234 Delivered",
-                      description:
-                          "Your dispatch to North Campus has been successfully delivered.",
-                      time: "Yesterday",
-                      onTap: () {
-                        _showNotificationDetails(
-                          context: context,
-                          title: "Dispatch #DSP-1234 Delivered",
-                          description:
-                              "Your dispatch to North Campus has been successfully delivered and confirmed by campus security.",
-                          time: "Yesterday, 4:30 PM",
-                          dispatchId: "#DSP-1234",
-                          status: "Delivered",
-                          location: "North Campus - Main Gate",
-                          sentBy: "School of STEM Logistics",
-                        );
-                      },
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             ],

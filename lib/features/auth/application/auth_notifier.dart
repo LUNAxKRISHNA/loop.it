@@ -1,26 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/models/user_model.dart';
 import '../data/auth_repository.dart';
 
-// Simple mock user model (no Freezed)
-class UserModel {
-  final String id;
-  final String? name;
-  final String? email;
-  final String? phone;
-  final DateTime createdAt;
-
-  const UserModel({
-    required this.id,
-    this.name,
-    this.email,
-    this.phone,
-    required this.createdAt,
-  });
-}
+export '../../../core/models/user_model.dart';
 
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<UserModel?>>((ref) {
-  return AuthNotifier(ref.read(authRepositoryProvider));
+  return AuthNotifier(ref.watch(authRepositoryProvider));
 });
 
 class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
@@ -59,4 +46,6 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
       state = AsyncError(e, st);
     }
   }
+
+  Future<void> refresh() => _fetchUser();
 }
